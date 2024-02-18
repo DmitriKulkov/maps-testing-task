@@ -1,9 +1,14 @@
-import { action, makeObservable, observable } from "mobx";
+import { action, makeObservable, observable, runInAction } from "mobx";
 import { feature, featureCollection } from "@turf/helpers";
-import { GeoJSONSource, TypedStyleLayer } from "maplibre-gl";
+import { GeoJSONSource, Point, PointLike } from "maplibre-gl";
 import { FeatureCollection } from "geojson";
+import moment from "moment";
 
-type FeatureType = "line" | "point" | undefined;
+const FEATURE_LAYERS = ["line", "point"] as const;
+
+type FeatureType = (typeof FEATURE_LAYERS)[number] | undefined;
+
+const CLICK_AREA_RADIUS = 5;
 
 export class MapStore {
   @observable map: maplibregl.Map | null = null;
@@ -12,9 +17,7 @@ export class MapStore {
 
   @observable lineFirstPoint: [number, number] | undefined;
 
-  @observable isLoading = false;
-
-  @observable hiddenLayers: FeatureType[] = [];
+  @observable currentInformation: string | undefined;
 
   constructor() {
     makeObservable(this);
@@ -31,6 +34,7 @@ export class MapStore {
           this.addLine([e.lngLat.lng, e.lngLat.lat]);
           break;
         default:
+          this.selectFeature(e.point);
           break;
       }
     });
@@ -71,49 +75,78 @@ export class MapStore {
   }
 
   private addPoint(coords: [number, number]) {
-    if (!this.map?.loaded()) {
-      return;
-    }
-    const creationDate = `${new Date().getTime()}`;
-    const point = feature({
-      id: creationDate,
-      type: "Point",
-      coordinates: coords,
-      properties: {},
-    });
-    const source = this.map.getSource("point") as GeoJSONSource;
-    source.setData(
-      featureCollection([
-        ...(source._data as FeatureCollection).features,
-        point,
-      ])
-    );
+    runInAction(() => {
+      if (!this.map?.loaded()) {
+        return;
+      }
+      const creationDate = `${new Date().getTime()}`;
+      const point = feature({
+        type: "Point",
+        coordinates: coords,
+        properties: {},
+      });
+      point.id = creationDate;
+      const source = this.map.getSource("point") as GeoJSONSource;
+      source.setData(
+        featureCollection([
+          ...(source._data as FeatureCollection).features,
+          point,
+        ])
+      );
 
-    this.setIsAdding();
+      this.setIsAdding();
+    });
   }
 
   private addLine(coords: [number, number]) {
-    if (!this.map?.loaded()) {
-      return;
-    }
+    runInAction(() => {
+      if (!this.map?.loaded()) {
+        return;
+      }
 
-    if (!this.lineFirstPoint) {
-      this.lineFirstPoint = coords;
-      return;
-    }
-    const creationDate = `${new Date().getTime()}`;
-    const line = feature({
-      id: creationDate,
-      type: "LineString",
-      coordinates: [this.lineFirstPoint, coords],
-      properties: {},
+      if (!this.lineFirstPoint) {
+        this.setLineFirstPoint(coords);
+        return;
+      }
+      const creationDate = `${new Date().getTime()}`;
+      const line = feature({
+        type: "LineString",
+        coordinates: [this.lineFirstPoint, coords],
+        properties: {},
+      });
+      line.id = creationDate;
+      const source = this.map.getSource("line") as GeoJSONSource;
+      source.setData(
+        featureCollection([
+          ...(source._data as FeatureCollection).features,
+          line,
+        ])
+      );
+      this.setIsAdding();
+      this.setLineFirstPoint();
     });
-    const source = this.map.getSource("line") as GeoJSONSource;
-    source.setData(
-      featureCollection([...(source._data as FeatureCollection).features, line])
-    );
-    this.setIsAdding();
-    this.lineFirstPoint = undefined;
+  }
+
+  @action setLineFirstPoint(point?: [number, number]) {
+    this.lineFirstPoint = point;
+  }
+
+  private selectFeature(point: Point) {
+    runInAction(() => {
+      if (!this.map) return;
+      const area: [PointLike, PointLike] = [
+        [point.x - CLICK_AREA_RADIUS, point.y - CLICK_AREA_RADIUS],
+        [point.x + CLICK_AREA_RADIUS, point.y + CLICK_AREA_RADIUS],
+      ];
+      const features = this.map.queryRenderedFeatures(area, {
+        layers: [...FEATURE_LAYERS],
+      });
+      if (!(features.length && features[0].id)) {
+        this.currentInformation = undefined;
+        return;
+      }
+      this.currentInformation = moment(features[0].id).format("DD.MM.YYYY");
+    });
   }
 
   @action setIsAdding(type?: FeatureType) {

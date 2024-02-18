@@ -2,8 +2,14 @@
     height: 100%;
     width: 6rem;
     background-color: aliceblue;
-    display: flex;
-    flex-direction: column;
     padding: 1rem;
     gap: 1rem
+}
+
+.sidebar__button {
+    margin-bottom: 0.5rem;
+}
+
+.sidebar__title {
+    font-weight: 500;
 }

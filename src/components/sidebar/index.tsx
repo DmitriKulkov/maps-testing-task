@@ -16,24 +16,54 @@ export const Sidebar = observer(() => {
 
   return (
     <div className="sidebar">
-      <button onClick={handleAddPoint} disabled={!!mapStore.isAdding}>
-        add point
+      <button
+        className="sidebar__button"
+        onClick={handleAddPoint}
+        disabled={!!mapStore.isAdding}
+      >
+        Add point
       </button>
-      <button onClick={handleTogglePoints} disabled={!!mapStore.isAdding}>
-        toggle points
+      <button
+        className="sidebar__button"
+        onClick={clearPoints}
+        disabled={!!mapStore.isAdding}
+      >
+        Clear points
       </button>
-      <button onClick={clearPoints} disabled={!!mapStore.isAdding}>
-        clear points
+      <button
+        className="sidebar__button"
+        onClick={handleAddLine}
+        disabled={!!mapStore.isAdding}
+      >
+        Add line
       </button>
-      <button onClick={handleAddLine} disabled={!!mapStore.isAdding}>
-        add line
+      <button
+        className="sidebar__button"
+        onClick={clearLines}
+        disabled={!!mapStore.isAdding}
+      >
+        Clear lines
       </button>
-      <button onClick={handleToggleLines} disabled={!!mapStore.isAdding}>
-        toggle lines
-      </button>
-      <button onClick={clearLines} disabled={!!mapStore.isAdding}>
-        clear lines
-      </button>
+      <hr />
+      <span className="sidebar__title">Visibility:</span>
+      <div>
+        <label htmlFor="points">Points</label>
+        <input
+          id="points"
+          type="checkbox"
+          defaultChecked
+          onChange={handleTogglePoints}
+        />
+      </div>
+      <div>
+        <label htmlFor="lines">Lines</label>
+        <input
+          id="lines"
+          type="checkbox"
+          defaultChecked
+          onChange={handleToggleLines}
+        />
+      </div>
     </div>
   );
 });

@@ -1,0 +1,27 @@
+.info {
+    position: fixed;
+    right: 1rem;
+    bottom: 3rem;
+    width: 15rem;
+    background-color: white;
+    color: black;
+    height: fit-content;
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.info__title {
+    font-size: 2rem;
+}
+
+.info__list {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.info__label {
+    font-weight: 500;
+}
