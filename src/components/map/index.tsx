@@ -11,20 +11,20 @@ export const Map = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
 
-  const [API_KEY] = useState("TEST KEY"); //TODO: move to .env
-
   useEffect(() => {
     if (map.current || !mapContainer.current) return;
 
     map.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${API_KEY}`,
+      style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${
+        import.meta.env.VITE_API_KEY
+      }`,
       center: CENTER_COORDS,
       zoom: INITIAL_ZOOM,
     });
     const { mapStore } = getStores();
     mapStore.setMap(map.current);
-  }, [API_KEY]);
+  }, []);
 
   return (
     <div className="map-wrap">

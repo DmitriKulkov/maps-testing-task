@@ -1,5 +1,9 @@
 .sidebar {
     height: 100%;
-    width: 100px;
+    width: 6rem;
     background-color: aliceblue;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem
 }
