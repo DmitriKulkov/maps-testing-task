@@ -49,7 +49,7 @@ export class MapStore {
 
       this.map?.addSource("line", {
         type: "geojson",
-        data: featureCollection([]),
+        data: featureCollection([]) as GeoJSON.GeoJSON,
       });
 
       this.map?.addLayer({
@@ -91,7 +91,7 @@ export class MapStore {
         featureCollection([
           ...(source._data as FeatureCollection).features,
           point,
-        ])
+        ]) as GeoJSON.GeoJSON
       );
 
       this.setIsAdding();
@@ -120,7 +120,7 @@ export class MapStore {
         featureCollection([
           ...(source._data as FeatureCollection).features,
           line,
-        ])
+        ]) as GeoJSON.GeoJSON
       );
       this.setIsAdding();
       this.setLineFirstPoint();
@@ -169,6 +169,6 @@ export class MapStore {
       return;
     }
     const source = this.map.getSource(type) as GeoJSONSource;
-    source.setData(featureCollection([]));
+    source.setData(featureCollection([]) as GeoJSON.GeoJSON);
   }
 }
