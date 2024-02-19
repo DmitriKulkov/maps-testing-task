@@ -1,4 +1,12 @@
-# React + TypeScript + Vite
+# Maps test task
+Test task with maplibregl
+
+## Environment
+`/.env` file:
+
+`VITE_API_KEY` - Your API key for https://www.maptiler.com/ 
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
